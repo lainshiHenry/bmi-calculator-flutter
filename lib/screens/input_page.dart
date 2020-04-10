@@ -1,12 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'reusable_card.dart';
-import 'icon_content.dart';
-import 'constants.dart';
+import 'package:bmi_calculator/components/reusable_card.dart';
+import 'package:bmi_calculator/components/icon_content.dart';
+import '../constants.dart';
 import 'results_page.dart';
-import 'bottom_button.dart';
-import 'round_icon_button.dart';
+import 'package:bmi_calculator/components/bottom_button.dart';
+import 'package:bmi_calculator/components/round_icon_button.dart';
+import 'package:bmi_calculator/calculator_brain.dart';
 
 enum Gender {
   male,
@@ -22,7 +23,7 @@ class _InputPageState extends State<InputPage> {
   Gender selectedGender = null;
   int height = 180; //cm
   int weight = 60; //kg
-  int age = 16;
+  int age = 23;
 
   @override
   Widget build(BuildContext context) {
@@ -133,9 +134,20 @@ class _InputPageState extends State<InputPage> {
                         'WEIGHT',
                         style: kLabelTextStyle,
                       ),
-                      Text(
-                        weight.toString(),
-                        style: kNumberTextStyle,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: <Widget>[
+                          Text(
+                            weight.toString(),
+                            style: kNumberTextStyle,
+                          ),
+                          Text(
+                            'kg',
+                            style: kLabelTextStyle,
+                          ),
+                        ],
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -186,7 +198,9 @@ class _InputPageState extends State<InputPage> {
                             icon: FontAwesomeIcons.minus,
                             onPressed: () {
                               setState(() {
-                                age--;
+                                if (age > 18) {
+                                  age--;
+                                }
                               });
                             },
                           ),
@@ -197,7 +211,9 @@ class _InputPageState extends State<InputPage> {
                               icon: FontAwesomeIcons.plus,
                               onPressed: () {
                                 setState(() {
-                                  age++;
+                                  if (age < 65) {
+                                    age++;
+                                  }
                                 });
                               })
                         ],
@@ -210,8 +226,17 @@ class _InputPageState extends State<InputPage> {
           )),
           BottomButton(
             onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ResultsPage()));
+              CalculatorBrain calc =
+                  CalculatorBrain(height: height, weight: weight);
+
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ResultsPage(
+                            bmiResult: calc.calculateBMI(),
+                            resultText: calc.getResult(),
+                            interpretationText: calc.getInterpretation(),
+                          )));
             },
             buttonTitle: 'CALCULATE',
           ),
